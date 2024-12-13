@@ -555,7 +555,7 @@ def test_submit_prevents_bad_guesses_too_high(freezer, capsys, pook):
     resp = "<article>That's not the right answer; your answer is too high</article>"
     pook.post("https://adventofcode.com/2022/day/1/answer", response_body=resp)
     puzzle = Puzzle(2022, 1)
-    puzzle.answer_a = "1234"
+    puzzle.answer_a = 1234
     out, err = capsys.readouterr()
     assert not err
     assert "That's not the right answer; your answer is too high" in out

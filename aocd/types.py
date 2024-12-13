@@ -6,7 +6,7 @@ from typing import Literal
 from typing import TypedDict
 from typing import Union
 
-AnswerValue = Union[str, Number]
+AnswerValue = Union[str, float, Number]
 """The answer to a puzzle, either a string or a number. Numbers are coerced to a string"""
 PuzzlePart = Literal["a", "b"]
 """The part of a given puzzle, a or b"""
