@@ -1,3 +1,4 @@
+# pyright: reportArgumentType=false
 import json
 import logging
 
@@ -280,5 +281,9 @@ def test_submit_float_warns(pook, capsys, caplog):
     )
     submit(1234.0, part="a", day=8, year=2022, session="whatever", reopen=False)
     assert post.calls == 1
-    record = ("aocd.models", logging.WARNING, "coerced float value 1234.0 for 2022/08 to '1234'")
+    record = (
+        "aocd.models",
+        logging.WARNING,
+        "coerced float value 1234.0 for 2022/08 to '1234'",
+    )
     assert record in caplog.record_tuples

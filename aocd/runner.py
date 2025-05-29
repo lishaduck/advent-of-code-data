@@ -205,7 +205,7 @@ def _process_wrapper(f, capture=False, **kwargs):
 
 def run_with_timeout(
     entry_point: EntryPoint,
-    timeout: float,
+    timeout: int,
     progress: str | None,
     dt: float = 0.1,
     capture: bool = False,
@@ -267,7 +267,7 @@ def run_one(
     day: int,
     data: str,
     entry_point: EntryPoint,
-    timeout: float = DEFAULT_TIMEOUT,
+    timeout: int = DEFAULT_TIMEOUT,
     progress: str | None = None,
     capture: bool = False,
 ) -> tuple[str, str, float, str]:

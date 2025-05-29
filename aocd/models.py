@@ -20,6 +20,8 @@ from itertools import count
 from pathlib import Path
 from textwrap import dedent
 
+from bs4 import PageElement, ResultSet
+
 from . import examples
 from .examples import Example
 from .exceptions import AocdError
@@ -137,6 +139,9 @@ class User:
             if response.status >= 400:
                 raise AocdError(f"HTTP {response.status} at {url}")
             soup = _get_soup(response.data)
+            assert soup.main
+            assert soup.article
+            assert soup.article.pre
             if soup.article is None and ur_broke in soup.main.text:
                 continue
             stats_txt = soup.article.pre.text
@@ -562,6 +567,7 @@ class Puzzle:
         if soup(string="[Log In]"):
             log.warning("Can't submit when unauthenticated")
             raise DeadTokenError(f"the auth token ...{self.user.token[-4:]} is dead")
+        assert soup.article
         message = soup.article.text
         self._save_submit_result(value=value, part=part, message=message, when=when)
         color = None
@@ -589,7 +595,7 @@ class Puzzle:
         elif "That's not the right answer" in message:
             color = "red"
             try:
-                context = soup.article.span.code.text
+                context = soup.article.span.code.text # type: ignore
             except AttributeError:
                 context = soup.article.text
             log.warning("wrong answer: %s", context)
@@ -800,7 +806,7 @@ class Puzzle:
         raise AocdError(f"Could not get prose for {self.year}/{self.day:02d}")
 
     @property
-    def easter_eggs(self) -> list[str]:
+    def easter_eggs(self) -> list[PageElement]:
         """
         Return a list of Easter eggs in the puzzle's description page. When you've
         completed all 25 days, adventofcode.com will reveal the Easter eggs directly in
@@ -810,7 +816,9 @@ class Puzzle:
         """
         txt = self._get_prose()
         soup = _get_soup(txt)
-        eggs = soup.find_all(["span", "em", "code"], class_=None, attrs={"title": bool})
+        eggs: ResultSet[PageElement] = soup.find_all(
+            ["span", "em", "code"], class_=None, attrs={"title": bool}
+        )
         return eggs
 
     def unlock_time(self, local: bool = True) -> datetime:
@@ -865,7 +873,7 @@ def _load_example_parser(group="adventofcode.examples", name="reference"):
         eps = entry_points().select(group=group, name=name)
     except AttributeError:
         # Python 3.9 - dict interface
-        eps = [ep for ep in entry_points()[group] if ep.name == name]
+        eps = [ep for ep in entry_points()[group] if ep.name == name] # type: ignore
     if not eps:
         msg = f"could not find the example parser plugin {group=}/{name=}"
         raise ExampleParserError(msg)

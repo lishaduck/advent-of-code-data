@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import glob
 import json
@@ -21,12 +23,11 @@ def get_working_tokens() -> dict[str, str]:
     try:
         import browser_cookie3 as bc3  # soft dependency
     except ImportError:
-        sys.exit("To use this feature you must pip install browser-cookie3")
+        sys.exit("To use this feature you must install `browser-cookie3`")
 
     log.info("checking browser storage for tokens, this might pop up an auth dialog!")
     log.info("checking chrome cookie jar...")
-    cookie_files = glob.glob(os.path.expanduser("~/.config/google-chrome/*/Cookies"))
-    cookie_files.append(None)
+    cookie_files: list[str | None] = [*glob.glob(os.path.expanduser("~/.config/google-chrome/*/Cookies")), None]
     chrome_cookies = []
     for cf in cookie_files:
         try:

@@ -14,10 +14,7 @@ import bs4
 
 from aocd import models
 from aocd.exceptions import ExampleParserError
-from aocd.utils import _get_soup
-from aocd.utils import AOC_TZ
-from aocd.utils import get_plugins
-
+from aocd.utils import AOC_TZ, _get_soup, get_plugins
 
 log: logging.Logger = logging.getLogger(__name__)
 
@@ -54,6 +51,7 @@ class Page:
     def from_raw(cls, html: str) -> Page:
         soup = _get_soup(html)
         title_pat = r"^Day (\d{1,2}) - Advent of Code (\d{4})$"
+        assert soup.title is not None
         title_text = soup.title.text
         if (match := re.match(title_pat, title_text)) is None:
             msg = f"failed to extract year/day from title {title_text!r}"
@@ -98,6 +96,7 @@ class Page:
             # actually used by an example parser
             raise AttributeError(name)
         article = self.article_a if part == "a" else self.article_b
+        assert article is not None
         if tag == "li":
             # list items usually need further drill-down
             result = article.find_all("li")

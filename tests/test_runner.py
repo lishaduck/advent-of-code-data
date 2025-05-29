@@ -1,3 +1,4 @@
+# pyright: reportArgumentType=false
 import pytest
 
 from aocd.runner import _process_wrapper

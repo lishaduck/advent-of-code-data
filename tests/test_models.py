@@ -1,8 +1,10 @@
+# pyright: reportArgumentType=false
 import decimal
 import fractions
 import logging
 from datetime import datetime
 from datetime import timedelta
+from bs4 import Tag
 
 import numpy as np
 import pytest
@@ -311,6 +313,7 @@ def test_easter_eggs(pook):
     puzzle = Puzzle(2017, 5)
     [egg] = puzzle.easter_eggs
     assert egg.text == "interrupt"
+    assert egg is Tag
     assert egg.attrs["title"] == "Later, on its turn, it sends you a sorcery."
 
 
@@ -351,6 +354,7 @@ def test_check_guess_against_saved_incorrect(mocker):
     mocker.patch("aocd.models.Puzzle._get_answer", return_value="two")
     puzzle = Puzzle(year=2019, day=4)
     rv = puzzle._check_already_solved("one", "a")
+    assert rv is not None
     assert "Part a already solved with different answer: two" in rv
 
 
@@ -465,7 +469,7 @@ def test_type_coercions(v_raw, v_expected, len_logs, caplog):
         (decimal.Decimal("123"), "123", 1),  # Decimal -> int
     ],
 )
-def test_type_coercions(v_raw, v_expected, len_logs, caplog):
+def test_type_coercions_2(v_raw, v_expected, len_logs, caplog):
     p = Puzzle(2022, 1)
     v_actual = p._coerce_val(v_raw)
     assert v_actual == v_expected, f"{type(v_raw)} {v_raw})"

@@ -16,12 +16,12 @@ jobs:
       fail-fast: false
       matrix:
         os:
-        - ubuntu-latest
-        - macos-latest
-        - windows-latest
-        python-version:
-        - "3.9"
-        - "3.13"
+          - ubuntu-latest
+          - macos-latest
+          - windows-latest
+        python-verson:
+          - "3.9"
+          - "3.13"
         include:
           - python-version: pypy-3.9
             os: ubuntu-latest
@@ -34,10 +34,10 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install
-        run: pip install -q -r tests/requirements.txt && pip freeze --all
+        run: uv sync --all-extras
 
       - name: Run tests for ${{ matrix.python-version }} on ${{ matrix.os }}
-        run: python -m pytest --durations=10
+        run: uv run pytest --durations=10
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -47,23 +47,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: astral-sh/setup-uv@v4
         with:
           python-version: "3.13"
-          cache: pip
+          enable-cache: true
 
-      - run: |
-          python -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
-          # Tell setuptools to *not* create a PEP 660 import hook and to use
-          # symlinks instead, so that pyright can still find the package. See
-          # https://microsoft.github.io/pyright/#/import-resolution?id=editable-installs
-          pip install --editable . --config-settings editable_mode=strict
+      - name: Install
+        run: uv sync --all-extras
 
-      - run: echo "$PWD/.venv/bin" >> $GITHUB_PATH
-
-      - uses: jakebailey/pyright-action@v2
-        with:
-          ignore-external: true
-          verify-types: aocd
+      - name: Typecheck project
+        run: uv run pyright
+      - name: Ensure typing coverage
+        run: uv run pyright --ignoreexternal --verifytypes=aocd

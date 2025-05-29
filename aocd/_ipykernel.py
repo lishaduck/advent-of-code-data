@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 import re
 
@@ -7,12 +9,19 @@ import urllib3
 def get_ipynb_path():
     # helper function so that "from aocd import data" can introspect the year/day from
     # the .ipynb filename. inline imports to avoid hard-dependency on IPython/jupyter
-    import IPython
     from jupyter_server import serverapp
     from jupyter_server.utils import url_path_join
 
-    app = IPython.get_ipython().config["IPKernelApp"]
-    kernel_id = re.search(r"(?<=kernel-)[\w\-]+(?=\.json)", app["connection_file"])[0]
+    from IPython.core.getipython import get_ipython
+
+
+    ipython = get_ipython()
+    assert ipython is not None
+
+    app = ipython.config["IPKernelApp"]
+    search = re.search(r"(?<=kernel-)[\w\-]+(?=\.json)", app["connection_file"])
+    assert search is not None
+    kernel_id = search[0]
     http = urllib3.PoolManager()
     for serv in serverapp.list_running_servers():
         url = url_path_join(serv["url"], "api/sessions")
