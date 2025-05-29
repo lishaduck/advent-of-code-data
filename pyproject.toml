@@ -1,6 +1,6 @@
 [build-system]
-requires = ["setuptools>=61.2"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "advent-of-code-data"
@@ -16,11 +16,11 @@ classifiers = [
     "Topic :: Games/Entertainment :: Puzzle Games",
 ]
 dependencies = [
+    "aocd-example-parser>=2023.2",
     "beautifulsoup4",
     "pebble",
+    "tzdata ; platform_system == 'Windows'",
     "urllib3",
-    'tzdata ; platform_system == "Windows"',
-    "aocd-example-parser >= 2023.2",
 ]
 
 [[project.authors]]
@@ -34,7 +34,24 @@ text = "MIT"
 Homepage = "https://github.com/wimglenn/advent-of-code-data"
 
 [project.optional-dependencies]
-nb = ["IPython", "jupyter-server"]
+nb = [
+    "ipython",
+    "jupyter-server",
+]
+
+[dependency-groups]
+dev = [
+    "freezegun>=1.5.1",
+    "numpy>=2.0.2",
+    "pook>=2.1.2",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "pytest-freezer>=0.4.9",
+    "pytest-mock>=3.14.0",
+    "pytest-raisin>=0.4",
+    "pytest-socket>=0.7.0",
+    "rich>=13.9.4",
+]
 
 [project.scripts]
 aocd = "aocd.cli:main"
@@ -42,12 +59,8 @@ aoc = "aocd.runner:main"
 aocd-token = "aocd.cookies:scrape_session_tokens"
 aoce = "aocd.examples:main"
 
-[tool.setuptools]
+[tool.hatch.build.targets.wheel]
 packages = ["aocd"]
-
-[tool.setuptools.package-data]
-aocd = ["py.typed"]
-
 
 [project.entry-points]
 "adventofcode.user" = {}  # for user solvers
@@ -66,5 +79,5 @@ markers = "answer_not_cached"
 
 [tool.coverage.report]
 exclude_also = [
-  "if t\\.TYPE_CHECKING:"
+    "if t\\.TYPE_CHECKING:"
 ]
